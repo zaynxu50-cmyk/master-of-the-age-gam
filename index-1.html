@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master of the Age — Knowledge Quest</title>
+<style>
+:root{--navy:#073b56;--blue:#0c5877;--gold:#d9b45b;--cream:#fff8e8;--ink:#173044;--green:#24765c;--red:#a73e35}
+*{box-sizing:border-box}body{margin:0;font-family:Georgia,'Times New Roman',serif;background:radial-gradient(circle at top,#fffdf5,#e9dfc5);color:var(--ink)}
+header{background:linear-gradient(120deg,#052e46,#0b5874);color:#fff8e8;padding:24px 16px;text-align:center;border-bottom:5px solid var(--gold)}
+header .eyebrow{letter-spacing:3px;text-transform:uppercase;font:700 12px Arial,sans-serif;color:#f2d78b}
+h1{font-size:clamp(28px,5vw,46px);margin:8px 0;color:#fff2ce}header p{margin:0 auto;max-width:650px;line-height:1.5}
+.wrap{max-width:900px;margin:22px auto;padding:0 14px 32px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fffdf5;border:1px solid #dfc780;border-radius:12px;padding:12px;text-align:center;box-shadow:0 3px 10px #16374b14}.stat strong{display:block;font:700 23px Arial;color:var(--blue)}.stat span{font:12px Arial,sans-serif;color:#536879}
+.panel{background:#fffdf5;border:1px solid #dfc780;border-radius:16px;padding:clamp(16px,4vw,28px);box-shadow:0 8px 22px #16374b15}
+.progress{height:9px;background:#e9e1cd;border-radius:20px;overflow:hidden;margin:8px 0 22px}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--gold));transition:width .3s}
+.pill{display:inline-block;background:#e7f0f1;color:var(--blue);border-radius:99px;padding:6px 10px;font:700 12px Arial,sans-serif}
+h2{font-size:clamp(22px,4vw,30px);margin:12px 0}.story{line-height:1.65;font-size:17px}.question{font-size:19px;line-height:1.5;margin:20px 0 14px}
+.answers{display:grid;gap:10px}.answer{width:100%;text-align:left;background:#fff;border:1.5px solid #d6d1c3;border-radius:10px;padding:13px 15px;font:16px Arial,sans-serif;color:var(--ink);cursor:pointer;transition:.15s}.answer:hover:not(:disabled){border-color:var(--blue);background:#f0f7f7}.answer:disabled{cursor:default}.answer.correct{border-color:var(--green);background:#e4f4ec}.answer.wrong{border-color:var(--red);background:#fff0ed}
+.feedback{min-height:50px;margin:14px 0 4px;line-height:1.5;font:15px Arial,sans-serif}.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.primary,.secondary{border:0;border-radius:10px;padding:12px 18px;font:700 15px Arial,sans-serif;cursor:pointer}.primary{background:var(--blue);color:white}.primary:hover{background:#063e58}.secondary{background:#eee5cf;color:var(--ink)}.primary:disabled{opacity:.45;cursor:not-allowed}
+.hidden{display:none}.finish{text-align:center}.seal{font-size:52px;margin:10px}.small{font:12px Arial,sans-serif;color:#60717b;line-height:1.5;margin-top:16px}
+footer{text-align:center;padding:14px;font:12px Arial,sans-serif;color:#64717a}
+@media(max-width:480px){.stats{gap:6px}.stat{padding:9px 4px}.stat strong{font-size:20px}.answer{font-size:15px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">An interactive learning adventure</div>
+  <h1>MASTER OF THE AGE</h1>
+  <p><em>Knowledge Quest</em> — explore the ideas and history introduced in the book by Paul E. Walker.</p>
+</header>
+<main class="wrap">
+  <section class="stats" aria-label="Game statistics">
+    <div class="stat"><strong id="score">0</strong><span>POINTS</span></div>
+    <div class="stat"><strong id="round">1 / 8</strong><span>CHALLENGE</span></div>
+    <div class="stat"><strong id="streak">0</strong><span>STREAK</span></div>
+  </section>
+  <section class="panel" id="game">
+    <span class="pill" id="chapter">THE SCHOLAR'S STUDY</span>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <h2 id="title">Begin your quest</h2>
+    <p class="story" id="story">Travel through eight challenges inspired by the book's introduction. Answer questions, collect points, and unlock the Scholar's Seal. This game is a learning activity, not a test of anyone's faith.</p>
+    <div class="question" id="question">Ready to begin?</div>
+    <div class="answers" id="answers"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <div class="actions">
+      <button class="primary" id="start">Start the Quest</button>
+      <button class="primary hidden" id="next" disabled>Next Challenge →</button>
+      <button class="secondary" id="reset">Restart</button>
+    </div>
+    <p class="small">Based on the provided preview of <em>Master of the Age: An Islamic Treatise on the Necessity of the Imamate</em>. Questions focus on its introduction and historical framing; the book presents a particular Ismaili argument, which the game identifies as the author's perspective.</p>
+  </section>
+  <section class="panel finish hidden" id="finish">
+    <div class="seal">✦ 🏆 ✦</div>
+    <h2 id="finishTitle">Quest complete!</h2>
+    <p class="story" id="finishText"></p>
+    <p><strong id="finalScore"></strong></p>
+    <button class="primary" id="playAgain">Play Again</button>
+  </section>
+</main>
+<footer>MASTER OF THE AGE • KNOWLEDGE QUEST</footer>
+<script>
+const challenges = [
+ {chapter:"LEVEL 1 • THE BOOK",title:"Identify the work",story:"Every quest begins by learning what kind of book is in front of you.",q:"What is the subtitle of <em>Master of the Age</em>?",a:["An Islamic Treatise on the Necessity of the Imamate","A History of Modern Egypt","The Art of Medieval Architecture","A Guide to Arabic Poetry"],correct:0,why:"The subtitle describes the work as an Islamic treatise about the necessity of the imamate."},
+ {chapter:"LEVEL 2 • THE AUTHOR",title:"Meet the thinker",story:"The book presents the ideas of a scholar active in the Fatimid period.",q:"Who wrote the original treatise discussed in the book?",a:["Paul E. Walker","Ḥamīd al-Dīn al-Kirmānī","Al-Fārābī","Al-Qāḍī al-Nuʿmān"],correct:1,why:"Ḥamīd al-Dīn al-Kirmānī authored al-Maṣābīḥ fī ithbāt al-imāma; Paul E. Walker edited and translated it."},
+ {chapter:"LEVEL 3 • THE EDITOR",title:"Follow the evidence",story:"Scholars compare manuscripts and translate texts so readers can study them.",q:"What role did Paul E. Walker have in this edition?",a:["He was the Fatimid ruler","He wrote every medieval source","He edited and translated the text","He designed the original manuscript"],correct:2,why:"The title page identifies Paul E. Walker as editor and translator of the Arabic text."},
+ {chapter:"LEVEL 4 • A KEY IDEA",title:"What is the imamate?",story:"The introduction explains that Muslim thinkers have discussed leadership of the community in different ways.",q:"In the introduction, what does “imamate” broadly refer to?",a:["A type of building","Supreme leadership of the Muslim community","A trading route","A manuscript decoration"],correct:1,why:"The introduction defines imamate broadly as the supreme leadership of the Muslim community."},
+ {chapter:"LEVEL 5 • DIFFERENT VIEWS",title:"Compare viewpoints",story:"The book's introduction describes different theories about how the community's leader should be recognised.",q:"According to the introduction, which position is associated with the Twelver and Ismaili Shia?",a:["The imam is chosen only by a public election","The question of leadership is unimportant","The Prophet designated ʿAlī as successor, according to this tradition","All historical schools agreed on every detail"],correct:2,why:"The author describes the Twelver and Ismaili Shia position as holding that the Prophet designated ʿAlī. Other Muslim traditions have different accounts."},
+ {chapter:"LEVEL 6 • REASONING",title:"Build an argument",story:"Al-Kirmānī's treatise aims to support its position through structured reasoning.",q:"What approach does the introduction say al-Kirmānī uses to argue for the imamate?",a:["Rational reasoning and formal logic","A collection of modern surveys","Only poetry and storytelling","Experiments in a laboratory"],correct:0,why:"The introduction emphasises philosophical premises, rational reasoning and the rules of formal logic."},
+ {chapter:"LEVEL 7 • HISTORY",title:"Place the scholar in time",story:"The text connects ideas about leadership with the Fatimid period and its political debates.",q:"Which imam-caliph is especially important to the treatise's historical setting?",a:["Al-Ḥākim bi-amr Allāh","Salah al-Din","Akbar","Harun al-Rashid"],correct:0,why:"The introduction explains that al-Kirmānī supported the Fatimid imam-caliph al-Ḥākim bi-amr Allāh."},
+ {chapter:"LEVEL 8 • THE SCHOLAR'S SEAL",title:"Read with care",story:"A strong reader distinguishes what a historical source argues from what all people necessarily believe.",q:"What is the most careful way to describe the book's argument?",a:["It proves that every Muslim school has always agreed","It presents al-Kirmānī's Ismaili argument for the necessity of the imamate","It is a modern political campaign","It contains no historical or philosophical reasoning"],correct:1,why:"The book presents a particular Ismaili theological and philosophical argument. Identifying the author's perspective helps us study it historically and thoughtfully."}
+];
+let index=0,score=0,streak=0,answered=false;
+const $=id=>document.getElementById(id);
+function render(){
+ const c=challenges[index]; answered=false;
+ $("chapter").textContent=c.chapter;$("title").textContent=c.title;$("story").innerHTML=c.story;
+ $("question").innerHTML=c.q;$("answers").innerHTML="";$("feedback").textContent="";$("feedback").className="feedback";
+ $("round").textContent=(index+1)+" / "+challenges.length;$("score").textContent=score;$("streak").textContent=streak;
+ $("bar").style.width=(index/challenges.length*100)+"%";
+ c.a.forEach((answer,i)=>{const b=document.createElement("button");b.className="answer";b.textContent=String.fromCharCode(65+i)+". "+answer;b.onclick=()=>choose(i);$("answers").appendChild(b)});
+ $("start").classList.add("hidden");$("next").classList.remove("hidden");$("next").disabled=true;
+}
+function choose(i){
+ if(answered)return;answered=true;const c=challenges[index];const buttons=[...$("answers").querySelectorAll("button")];
+ buttons.forEach((b,n)=>{b.disabled=true;if(n===c.correct)b.classList.add("correct");if(n===i&&i!==c.correct)b.classList.add("wrong")});
+ if(i===c.correct){score+=100;streak++;$("feedback").className="feedback good";$("feedback").textContent="Correct! +100 points. "+c.why}
+ else{streak=0;$("feedback").className="feedback bad";$("feedback").textContent="Not quite. "+c.why}
+ $("score").textContent=score;$("streak").textContent=streak;$("next").disabled=false;$("next").textContent=index===challenges.length-1?"Reveal My Result ✦":"Next Challenge →";
+}
+function finish(){
+ $("game").classList.add("hidden");$("finish").classList.remove("hidden");$("bar").style.width="100%";$("finalScore").textContent="Final score: "+score+" / "+(challenges.length*100);
+ let title,desc;if(score>=700){title="Master Scholar!";desc="Excellent work. You connected the book's title, author, key concepts and historical context."}else if(score>=400){title="Curious Historian!";desc="Good progress. You have a solid start—replay to practise the ideas and historical details."}else{title="Quest Explorer!";desc="Every challenge is a chance to learn. Replay the quest and pay attention to the explanations after each answer."}
+ $("finishTitle").textContent=title;$("finishText").textContent=desc;
+}
+function reset(){index=0;score=0;streak=0;$("finish").classList.add("hidden");$("game").classList.remove("hidden");$("start").classList.remove("hidden");$("next").classList.add("hidden");$("chapter").textContent="THE SCHOLAR'S STUDY";$("title").textContent="Begin your quest";$("story").textContent="Travel through eight challenges inspired by the book's introduction. Answer questions, collect points, and unlock the Scholar's Seal. This game is a learning activity, not a test of anyone's faith.";$("question").textContent="Ready to begin?";$("answers").innerHTML="";$("feedback").textContent="";$("score").textContent="0";$("round").textContent="1 / 8";$("streak").textContent="0";$("bar").style.width="0%"}
+$("start").onclick=render;$("next").onclick=()=>{if(!answered)return;if(index<challenges.length-1){index++;render()}else finish()};$("reset").onclick=reset;$("playAgain").onclick=reset;
+</script>
+</body>
+</html>
